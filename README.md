@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/sitegpt-sourcesyncai-mcp-badge.png)](https://mseep.ai/app/sitegpt-sourcesyncai-mcp)
+
 # SourceSync.ai MCP Server
 
 [![smithery badge](https://smithery.ai/badge/@pbteja1998/sourcesyncai-mcp)](https://smithery.ai/server/@pbteja1998/sourcesyncai-mcp)
