@@ -154,7 +154,9 @@ export const ingestTextSchema = z.object({
     config: z.object({
       name: z.string().optional(),
       text: z.string(),
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     }),
     chunkConfig: chunkConfigSchema.optional(),
   }),
@@ -193,8 +195,14 @@ export const DeleteNamespaceSchema = deleteNamespaceSchema
 export const IngestTextSchema = ingestTextSchema
 export const IngestFileSchema = z.object({
   namespaceId: namespaceIdSchema.optional(),
-  file: z.instanceof(Blob),
-  metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+  // Zod 4 cannot turn z.instanceof into JSON Schema (tools/list would fail);
+  // zod 3 advertised {} for it. Same check and message, advertised as {}.
+  file: z.any().refine((value) => value instanceof Blob, {
+    message: 'Input not instance of Blob',
+  }),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
   chunkConfig: chunkConfigSchema.optional(),
   tenantId: tenantIdSchema,
 })
@@ -206,7 +214,9 @@ export const IngestUrlsSchema = z.object({
     config: z.object({
       urls: z.array(z.string()),
       scrapeOptions: ScrapeOptionsSchema.optional(),
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     }),
     chunkConfig: chunkConfigSchema.optional(),
   }),
@@ -222,7 +232,9 @@ export const IngestSitemapSchema = z.object({
       maxLinks: z.number().optional(),
       includePaths: z.array(z.string()).optional(),
       excludePaths: z.array(z.string()).optional(),
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     }),
     chunkConfig: chunkConfigSchema.optional(),
   }),
@@ -239,7 +251,9 @@ export const IngestWebsiteSchema = z.object({
       maxLinks: z.number().optional(),
       includePaths: z.array(z.string()).optional(),
       excludePaths: z.array(z.string()).optional(),
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     }),
     chunkConfig: chunkConfigSchema.optional(),
   }),
@@ -250,7 +264,9 @@ export const IngestGoogleDriveSchema = z.object({
   namespaceId: namespaceIdSchema.optional(),
   connectionId: z.string().min(1, 'Connection ID is required'),
   folderId: z.string().optional(),
-  metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
   apiKey: apiKeySchema.optional(),
   tenantId: tenantIdSchema,
 })
@@ -259,7 +275,9 @@ export const IngestNotionSchema = z.object({
   namespaceId: namespaceIdSchema.optional(),
   connectionId: z.string().min(1, 'Connection ID is required'),
   pageId: z.string().optional(),
-  metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
   apiKey: apiKeySchema.optional(),
   tenantId: tenantIdSchema,
 })
@@ -270,7 +288,9 @@ export const IngestConnectorSchema = z.object({
     source: z.string(),
     config: z.object({
       connectionId: z.string(),
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     }),
     chunkConfig: chunkConfigSchema.optional(),
   }),
@@ -295,7 +315,9 @@ export const DocumentFilterConfigSchema = z.object({
   documentIngestionStatuses: z
     .array(z.nativeEnum(SourceSyncIngestionStatus))
     .optional(),
-  metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
 })
 
 export const DocumentIncludeConfigSchema = z.object({
@@ -360,7 +382,7 @@ export const FilterConfigSchema = z.object({
       ]),
     )
     .optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 })
 
 export const FetchDocumentsSchema = z.object({
@@ -386,18 +408,20 @@ export const UpdateDocumentsSchema = z.object({
   documents: z.array(
     z.object({
       documentId: z.string(),
-      metadata: z.record(z.string()).optional(),
+      metadata: z.record(z.string(), z.string()).optional(),
     }),
   ),
   tenantId: tenantIdSchema,
   filterConfig: FilterConfigSchema,
   data: z.object({
-    metadata: z.record(z.string()).optional(),
+    metadata: z.record(z.string(), z.string()).optional(),
     $metadata: z
       .object({
-        $set: z.record(z.union([z.string(), z.array(z.string())])).optional(),
-        $append: z.record(z.array(z.string())).optional(),
-        $remove: z.record(z.array(z.string())).optional(),
+        $set: z
+          .record(z.string(), z.union([z.string(), z.array(z.string())]))
+          .optional(),
+        $append: z.record(z.string(), z.array(z.string())).optional(),
+        $remove: z.record(z.string(), z.array(z.string())).optional(),
       })
       .optional(),
   }),
@@ -421,7 +445,9 @@ export const ResyncDocumentsSchema = z.object({
 export const SearchTypeEnum = z.nativeEnum(SourceSyncSearchType)
 
 export const SearchFilterSchema = z.object({
-  metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+  metadata: z
+    .record(z.string(), z.union([z.string(), z.array(z.string())]))
+    .optional(),
 })
 
 export const SemanticSearchSchema = z.object({
@@ -431,7 +457,9 @@ export const SemanticSearchSchema = z.object({
   scoreThreshold: z.number().optional(),
   filter: z
     .object({
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     })
     .optional(),
   tenantId: tenantIdSchema,
@@ -450,7 +478,9 @@ export const HybridSearchSchema = z.object({
   scoreThreshold: z.number().optional(),
   filter: z
     .object({
-      metadata: z.record(z.union([z.string(), z.array(z.string())])).optional(),
+      metadata: z
+        .record(z.string(), z.union([z.string(), z.array(z.string())]))
+        .optional(),
     })
     .optional(),
   hybridConfig: z.object({
